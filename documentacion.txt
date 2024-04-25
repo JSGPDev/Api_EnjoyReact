@@ -1,0 +1,42 @@
+POST /log-in
+Inicia sesión de un usuario existente.
+
+Request
+Method: POST
+URL: /log-in
+Body:
+correo (string, required): Correo electrónico del usuario.
+contrasenia (string, required): Contraseña del usuario.
+Response
+200 OK: Si la autenticación es exitosa.
+loggin (boolean): Indica si el inicio de sesión fue exitoso.
+400 Bad Request: Si hay un error en los datos enviados.
+500 Internal Server Error: Si ocurre un error en el servidor.
+POST /sign-up
+Registra un nuevo usuario y envía un código de verificación al correo proporcionado.
+
+Request
+Method: POST
+URL: /sign-up
+Body:
+correo (string, required): Correo electrónico del nuevo usuario.
+contrasenia (string, required): Contraseña del nuevo usuario.
+Response
+200 OK: Si el registro es exitoso y se envía el código de verificación.
+correcto (boolean): Indica si el registro y el envío del código fueron exitosos.
+400 Bad Request: Si hay un error en los datos enviados.
+500 Internal Server Error: Si ocurre un error en el servidor.
+POST /check-code
+Verifica el código de verificación enviado al correo electrónico durante el registro.
+
+Request
+Method: POST
+URL: /check-code
+Body:
+correo (string, required): Correo electrónico del usuario.
+codigo (string, required): Código de verificación recibido por correo.
+Response
+200 OK: Si el código de verificación es correcto.
+correcto (boolean): Indica si el código de verificación es correcto.
+400 Bad Request: Si hay un error en los datos enviados.
+500 Internal Server Error: Si ocurre un error en el servidor.
