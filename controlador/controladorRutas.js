@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const modeloSesion = require("../model/modeloSesion.js")
+const modeloSesion = require("../modelo/modeloSesion.js")
 
 router.get("/", (req, res) => {
     const message = `
