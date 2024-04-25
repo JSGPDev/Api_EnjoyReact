@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const sessionModel = require("../model/sessionModel.js")
+const modeloSesion = require("../model/modeloSesion.js")
 
 router.get("/", (req, res) => {
     const message = `
@@ -20,7 +20,7 @@ router.get("/", (req, res) => {
 router.post("/log-in", async (req, res) => {
     const { correo, contrasenia } = req.body;
     try {
-        const result = await sessionModel.check_correo(correo, contrasenia);
+        const result = await modeloSesion.check_correo(correo, contrasenia);
         res.json(result);
     } catch (error) {
         console.error(error);
@@ -31,7 +31,7 @@ router.post("/log-in", async (req, res) => {
 router.post("/sign-up", async (req, res) => {
     const { correo, contrasenia } = req.body;
     try {
-        const result = await sessionModel.enviar_codigo_verif(correo, contrasenia);
+        const result = await modeloSesion.enviar_codigo_verif(correo, contrasenia);
         res.json(result);
     } catch (error) {
         console.error(error);
@@ -43,7 +43,7 @@ router.post("/sign-up", async (req, res) => {
 router.post("/check-code", async (req, res) => {
     const { correo, codigo } = req.body;
     try {
-        const result = await sessionModel.check_codigo_verif(correo, codigo);
+        const result = await modeloSesion.check_codigo_verif(correo, codigo);
         res.json(result);
     } catch (error) {
         console.error(error);

@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-const db = require("../servicios/dbConection");
+const db = require("../servicios/db");
 const enviarCorreo = require("../servicios/mailer");
 
 const saltos = 10;
