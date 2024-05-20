@@ -20,9 +20,9 @@ class Session {
     async check_correo(correo, contrasenia) {
         try {
             const conexion = await db.conectar();
-            const [results] = await conexion.query(`SELECT * FROM usuarios WHERE correo = ?`, [correo]);
+            const [results] = await conexion.query(`SELECT * FROM usuario WHERE correoUsuario = ?`, [correo]);
 
-            if (results.length > 0 && await bcrypt.compare(contrasenia, results[0].contrasenia)) {
+            if (results.length > 0 && await bcrypt.compare(contrasenia, results[0].contraseniaUsuario)) {
                 return { correcto: true, error: null };
             } else {
                 return { correcto: false, error: "correo y/o contraseña incorrectos" };
@@ -32,12 +32,12 @@ class Session {
         }
     }
 
-    async enviar_codigo_verif(correo, contrasenia) {
+    async enviar_codigo_verif(nombre, correo, contrasenia, existe) {
         const conexion = await db.conectar();
-        const [results] = await conexion.query(`SELECT * FROM usuarios WHERE correo = ?`, [correo]);
+        const [results] = await conexion.query(`SELECT * FROM usuario WHERE correoUsuario = ?`, [correo]);
 
 
-        if (results.length == 0) {
+        if (results.length == 0 || existe) {
             const codigo = Math.floor(100000 + Math.random() * 900000);
             const mensajeCorreo = `
             <h1>Código de Verificación</h1>
@@ -51,7 +51,8 @@ class Session {
             `;
             temp = {
                 [correo]: {
-                    "contrasenia": contrasenia,
+                    "nombre": nombre || NaN,
+                    "contrasenia": contrasenia || NaN,
                     "codigo": codigo
                 }
             }
@@ -73,7 +74,30 @@ class Session {
             try {
                 const conexion = await db.conectar();
                 const contrasenia = await bcrypt.hash(temp[correo].contrasenia, saltos); // Esperar a que se resuelva la promesa de hash
-                const [results, _] = await conexion.query(`INSERT INTO usuarios (correo, contrasenia) VALUES (?,?)`, [correo, contrasenia]);
+                const nombre = temp[correo].nombre;
+                const [results, _] = await conexion.query(`INSERT INTO usuario (correoUsuario, contraseniaUsuario,nombreUsuario) VALUES (?,?,?)`, [correo, contrasenia, nombre]);
+
+                if (results && results.affectedRows === 1) {
+                    eliminarTemp();
+                    return { correcto: true, error: null };
+                } else {
+                    return { correcto: false, error: "Error al insertar en la base de datos" };
+                }
+            } catch (error) {
+                return { correcto: false, error: error.message };
+            }
+        } else {
+            return { correcto: false, error: "Código de verificación incorrecto o no válido" };
+        }
+    }
+
+    async check_codigo_verif_update(correo, codigo, nuevaCont) {
+        console.log(temp[correo].codigo);
+        if (temp[correo] && temp[correo].codigo === codigo) {
+            try {
+                const conexion = await db.conectar();
+                const contrasenia = await bcrypt.hash(nuevaCont, saltos); // Esperar a que se resuelva la promesa de hash
+                const [results, _] = await conexion.query(`UPDATE usuario SET contraseniaUsuario = ? WHERE correoUsuario = ?`, [contrasenia, correo]);
 
                 if (results && results.affectedRows === 1) {
                     eliminarTemp();
